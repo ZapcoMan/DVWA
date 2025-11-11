@@ -1,14 +1,51 @@
 <?php
 
+/**
+ * 定义DVWA项目根目录的相对路径常量
+ */
 define( 'DVWA_WEB_PAGE_TO_ROOT', '' );
+
+/**
+ * 引入DVWA核心页面处理文件，包含初始化函数和通用工具函数
+ */
 require_once DVWA_WEB_PAGE_TO_ROOT . 'dvwa/includes/dvwaPage.inc.php';
 
+/**
+ * 启动DVWA页面初始化流程
+ *
+ * @param array $requirements 页面启动所需的安全检查项，如认证状态、PHPIDS防护等
+ *                            - 'authenticated': 需要用户已登录认证
+ *                            - 'phpids': 启用PHPIDS入侵检测系统
+ */
 dvwaPageStartup( array( 'authenticated', 'phpids' ) );
 
+/**
+ * 创建一个新的页面数据结构，用于存储页面标题、内容等信息
+ *
+ * @return array 返回初始化后的页面数组，包含title、page_id、body等键
+ */
 $page = dvwaPageNewGrab();
+
+/**
+ * 设置页面标题，将“Welcome”与原有标题拼接
+ */
 $page[ 'title' ]   = 'Welcome' . $page[ 'title_separator' ].$page[ 'title' ];
+
+/**
+ * 设置页面ID为home，用于标识当前页面
+ */
 $page[ 'page_id' ] = 'home';
 
+/**
+ * 构造页面主体内容（body），包括欢迎信息、项目介绍、使用警告和相关链接
+ *
+ * 内容结构如下：
+ * - 欢迎语和汉化信息
+ * - DVWA项目简介
+ * - 使用说明和目标
+ * - 安全警告和免责声明
+ * - 其他安全训练项目的推荐链接
+ */
 $page[ 'body' ] .= "
 <div class=\"body_padded\">
 	<h1>欢迎来到DVWA漏洞环境!</h1>
@@ -45,6 +82,11 @@ $page[ 'body' ] .= "
 	<br />
 </div>";
 
+/**
+ * 输出最终构造好的HTML页面内容
+ *
+ * @param array $page 包含页面所有信息的数组，包括标题、ID和主体内容
+ */
 dvwaHtmlEcho( $page );
 
 ?>
