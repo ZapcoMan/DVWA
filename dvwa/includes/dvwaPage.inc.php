@@ -24,7 +24,8 @@ if( !isset( $html ) ) {
 $security_levels = array('low', 'medium', 'high', 'impossible');
 if( !isset( $_COOKIE[ 'security' ] ) || !in_array( $_COOKIE[ 'security' ], $security_levels ) ) {
 	// Set security cookie to impossible if no cookie exists
-	if( in_array( $_DVWA[ 'default_security_level' ], $security_levels) ) {
+    $_DVWA = '';
+    if( in_array( $_DVWA[ 'default_security_level' ], $security_levels) ) {
 		dvwaSecurityLevelSet( $_DVWA[ 'default_security_level' ] );
 	}
 	else {
@@ -437,6 +438,7 @@ function dvwaButtonSourceHtmlGet( $pId ) {
 
 // Database Management --
 
+$DBMS = '';
 if( $DBMS == 'MySQL' ) {
 	$DBMS = htmlspecialchars(strip_tags( $DBMS ));
 	$DBMS_errorFunc = 'mysqli_error()';
@@ -468,7 +470,8 @@ function dvwaDatabaseConnect() {
 		|| !@((bool)mysqli_query($GLOBALS["___mysqli_ston"], "USE " . $_DVWA[ 'db_database' ])) ) {
 			//die( $DBMS_connError );
 			dvwaLogout();
-			dvwaMessagePush( 'Unable to connect to the database.<br />' . $DBMS_errorFunc );
+            $DBMS_errorFunc = '';
+            dvwaMessagePush( 'Unable to connect to the database.<br />' . $DBMS_errorFunc );
 			dvwaRedirect( DVWA_WEB_PAGE_TO_ROOT . 'setup.php' );
 		}
 		// MySQL PDO Prepared Statements (for impossible levels)
