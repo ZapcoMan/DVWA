@@ -33,9 +33,6 @@ Damn Vulnerable Web Application (DVWA) 的发布是为了希望它有用，但�
 
 - - -
 
-
-- - -
-
 ## 下载
 
 虽然有各种版本的 DVWA，但唯一受支持的版本是来自官方 GitHub 存储仓库（repository）的最新源码。 你可以从 repo 中克隆它：
