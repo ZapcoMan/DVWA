@@ -2,7 +2,7 @@
 
 /*
 
-This file contains all of the code to setup the initial MySQL database. (setup.php)
+此文件包含所有用于设置初始MySQL数据库的代码。(setup.php)
 
 */
 
@@ -10,44 +10,50 @@ if( !defined( 'DVWA_WEB_PAGE_TO_ROOT' ) ) {
 	define( 'DVWA_WEB_PAGE_TO_ROOT', '../../../' );
 }
 
+/*
+ * 尝试连接到 MySQL 数据库服务器。
+ * 如果连接失败，将显示错误信息并重载页面。
+ */
 if( !@($GLOBALS["___mysqli_ston"] = mysqli_connect( $_DVWA[ 'db_server' ],  $_DVWA[ 'db_user' ],  $_DVWA[ 'db_password' ], "", $_DVWA[ 'db_port' ] )) ) {
-	dvwaMessagePush( "Could not connect to the database service.<br />Please check the config file.<br />Database Error #" . mysqli_connect_errno() . ": " . mysqli_connect_error() . "." );
+	dvwaMessagePush( "无法连接到数据库服务。<br />请检查配置文件。<br />数据库错误 #" . mysqli_connect_errno() . ": " . mysqli_connect_error() . "." );
 	if ($_DVWA[ 'db_user' ] == "root") {
-		dvwaMessagePush( 'Your database user is root, if you are using MariaDB, this will not work, please read the README.md file.' );
+		dvwaMessagePush( '您的数据库用户是root，如果您使用的是MariaDB，这将不起作用，请阅读README.md文件。' );
 	}
 	dvwaPageReload();
 }
 
-// Create database
+// 删除已存在的数据库（如果存在）
 $drop_db = "DROP DATABASE IF EXISTS {$_DVWA[ 'db_database' ]};";
 if( !@mysqli_query($GLOBALS["___mysqli_ston"],  $drop_db ) ) {
-	dvwaMessagePush( "Could not drop existing database<br />SQL: " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) );
+	dvwaMessagePush( "无法删除现有数据库<br />SQL: " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) );
 	dvwaPageReload();
 }
 
+// 创建新的数据库
 $create_db = "CREATE DATABASE {$_DVWA[ 'db_database' ]};";
 if( !@mysqli_query($GLOBALS["___mysqli_ston"],  $create_db ) ) {
-	dvwaMessagePush( "Could not create database<br />SQL: " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) );
+	dvwaMessagePush( "无法创建数据库<br />SQL: " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) );
 	dvwaPageReload();
 }
-dvwaMessagePush( "Database has been created." );
+dvwaMessagePush( "数据库已创建。" );
 
 
-// Create table 'users'
+// 使用新创建的数据库
 if( !@((bool)mysqli_query($GLOBALS["___mysqli_ston"], "USE " . $_DVWA[ 'db_database' ])) ) {
-	dvwaMessagePush( 'Could not connect to database.' );
+	dvwaMessagePush( '无法连接到数据库。' );
 	dvwaPageReload();
 }
 
+// 创建用户表 'users'
 $create_tb = "CREATE TABLE users (user_id int(6),first_name varchar(15),last_name varchar(15), user varchar(15), password varchar(32),avatar varchar(70), last_login TIMESTAMP, failed_login INT(3), PRIMARY KEY (user_id));";
 if( !mysqli_query($GLOBALS["___mysqli_ston"],  $create_tb ) ) {
-	dvwaMessagePush( "Table could not be created<br />SQL: " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) );
+	dvwaMessagePush( "无法创建表<br />SQL: " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) );
 	dvwaPageReload();
 }
-dvwaMessagePush( "'users' table was created." );
+dvwaMessagePush( "'users' 表已创建。" );
 
 
-// Insert some data into users
+// 向 users 表中插入初始数据
 $base_dir= str_replace ("setup.php", "", $_SERVER['SCRIPT_NAME']);
 $avatarUrl  = $base_dir . 'hackable/users/';
 
@@ -58,47 +64,47 @@ $insert = "INSERT INTO users VALUES
 	('4','Pablo','Picasso','pablo',MD5('letmein'),'{$avatarUrl}pablo.jpg', NOW(), '0'),
 	('5','Bob','Smith','smithy',MD5('password'),'{$avatarUrl}smithy.jpg', NOW(), '0');";
 if( !mysqli_query($GLOBALS["___mysqli_ston"],  $insert ) ) {
-	dvwaMessagePush( "Data could not be inserted into 'users' table<br />SQL: " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) );
+	dvwaMessagePush( "无法向 'users' 表插入数据<br />SQL: " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) );
 	dvwaPageReload();
 }
-dvwaMessagePush( "Data inserted into 'users' table." );
+dvwaMessagePush( "数据已插入到 'users' 表中。" );
 
 
-// Create guestbook table
+// 创建留言簿表 'guestbook'
 $create_tb_guestbook = "CREATE TABLE guestbook (comment_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT, comment varchar(300), name varchar(100), PRIMARY KEY (comment_id));";
 if( !mysqli_query($GLOBALS["___mysqli_ston"],  $create_tb_guestbook ) ) {
-	dvwaMessagePush( "Table could not be created<br />SQL: " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) );
+	dvwaMessagePush( "无法创建表<br />SQL: " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) );
 	dvwaPageReload();
 }
-dvwaMessagePush( "'guestbook' table was created." );
+dvwaMessagePush( "'guestbook' 表已创建。" );
 
 
-// Insert data into 'guestbook'
-$insert = "INSERT INTO guestbook VALUES ('1','This is a test comment.','test');";
+// 向 guestbook 表中插入数据
+$insert = "INSERT INTO guestbook VALUES ('1','这是一个测试评论。','test');";
 if( !mysqli_query($GLOBALS["___mysqli_ston"],  $insert ) ) {
-	dvwaMessagePush( "Data could not be inserted into 'guestbook' table<br />SQL: " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) );
+	dvwaMessagePush( "无法向 'guestbook' 表插入数据<br />SQL: " . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) );
 	dvwaPageReload();
 }
-dvwaMessagePush( "Data inserted into 'guestbook' table." );
+dvwaMessagePush( "数据已插入到 'guestbook' 表中。" );
 
 
 
 
-// Copy .bak for a fun directory listing vuln
+// 复制 .bak 文件以制造有趣的目录列表漏洞
 $conf = DVWA_WEB_PAGE_TO_ROOT . 'config/config.inc.php';
 $bakconf = DVWA_WEB_PAGE_TO_ROOT . 'config/config.inc.php.bak';
 if (file_exists($conf)) {
-	// Who cares if it fails. Suppress.
+	// 如果失败了也没关系。抑制错误。
 	@copy($conf, $bakconf);
 }
 
-dvwaMessagePush( "Backup file /config/config.inc.php.bak automatically created" );
+dvwaMessagePush( "备份文件 /config/config.inc.php.bak 已自动创建" );
 
-// Done
-dvwaMessagePush( "<em>Setup successful</em>!" );
+// 完成
+dvwaMessagePush( "<em>设置成功</em>!" );
 
 if( !dvwaIsLoggedIn())
-	dvwaMessagePush( "Please <a href='login.php'>login</a>.<script>setTimeout(function(){window.location.href='login.php'},5000);</script>" );
+	dvwaMessagePush( "请<a href='login.php'>登录</a>。<script>setTimeout(function(){window.location.href='login.php'},5000);</script>" );
 dvwaPageReload();
 
 ?>
